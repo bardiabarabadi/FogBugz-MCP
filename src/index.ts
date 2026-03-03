@@ -28,7 +28,7 @@ if (!FOGBUGZ_URL || !FOGBUGZ_TOKEN) {
 const client = new FogBugzClient(FOGBUGZ_URL, FOGBUGZ_TOKEN);
 
 const server = new McpServer({
-  name: "manuscript-mcp",
+  name: "fogbugz-mcp",
   version: "1.0.0",
 });
 

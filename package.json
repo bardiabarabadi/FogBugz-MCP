@@ -1,21 +1,28 @@
 {
-  "name": "manuscript-mcp",
+  "name": "fogbugz-mcp",
   "version": "1.0.0",
   "description": "MCP server for FogBugz (Manuscript) – search cases, view details, manage lifecycle, and more.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "manuscript-mcp": "dist/index.js"
+    "fogbugz-mcp": "dist/index.js"
   },
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
   },
   "keywords": ["mcp", "fogbugz", "manuscript", "cursor", "claude"],
+  "author": "Bardia Barabadi",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bardiabarabadi/FogBugz-MCP.git"
+  },
   "engines": {
     "node": ">=18.0.0"
   },

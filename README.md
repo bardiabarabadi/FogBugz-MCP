@@ -1,6 +1,6 @@
-# Manuscript MCP Server
+# FogBugz MCP Server
 
-An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server for **FogBugz / Manuscript**. Connect Cursor, Claude Desktop, or any MCP-compatible client to your FogBugz instance and let an AI assistant search cases, read comments, reassign work, resolve bugs, and more — all through natural language.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server for **FogBugz**. Connect Cursor, Claude Desktop, or any MCP-compatible client to your FogBugz instance and let an AI assistant search cases, read comments, reassign work, resolve bugs, and more — all through natural language.
 
 ## Features
 
@@ -26,14 +26,26 @@ Every response includes a direct link to the case in FogBugz.
 
 ## Installation
 
+### From npm (recommended)
+
 ```bash
-git clone https://github.com/bardiabarabadi/Manuscript-MCP.git
-cd Manuscript-MCP
+npm install -g fogbugz-mcp
+```
+
+Or run directly with `npx`:
+
+```bash
+npx fogbugz-mcp
+```
+
+### From source
+
+```bash
+git clone https://github.com/bardiabarabadi/FogBugz-MCP.git
+cd FogBugz-MCP
 npm install
 npm run build
 ```
-
-After building, the server binary is at `dist/index.js`.
 
 ## Configuration
 
@@ -57,9 +69,9 @@ Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.jso
 ```json
 {
   "mcpServers": {
-    "manuscript": {
-      "command": "node",
-      "args": ["/absolute/path/to/Manuscript-MCP/dist/index.js"],
+    "fogbugz": {
+      "command": "npx",
+      "args": ["-y", "fogbugz-mcp"],
       "env": {
         "FOGBUGZ_URL": "https://mycompany.fogbugz.com",
         "FOGBUGZ_TOKEN": "your-api-token-here"
@@ -69,9 +81,9 @@ Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.jso
 }
 ```
 
-Replace the path and credentials with your own values. Restart Cursor after saving.
+Replace the credentials with your own values. Restart Cursor after saving.
 
-To verify, open Cursor's MCP panel (gear icon → MCP) and check that `manuscript` appears as connected.
+To verify, open Cursor's MCP panel (gear icon → MCP) and check that `fogbugz` appears as connected.
 
 ## Connecting to Claude Desktop
 
@@ -83,9 +95,9 @@ Edit `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "manuscript": {
-      "command": "node",
-      "args": ["/absolute/path/to/Manuscript-MCP/dist/index.js"],
+    "fogbugz": {
+      "command": "npx",
+      "args": ["-y", "fogbugz-mcp"],
       "env": {
         "FOGBUGZ_URL": "https://mycompany.fogbugz.com",
         "FOGBUGZ_TOKEN": "your-api-token-here"
@@ -205,7 +217,7 @@ Once connected, you can ask your AI assistant things like:
 
 ```bash
 # Run in development mode (no build needed)
-FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token npx tsx src/index.ts
+FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token npm run dev
 
 # Run tests
 npm test
