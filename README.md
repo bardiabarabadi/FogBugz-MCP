@@ -32,47 +32,6 @@ Every response includes a direct link to the case in FogBugz.
 - A **FogBugz / Manuscript** instance with API access
 - A **FogBugz API token** — see [Creating an API Token](https://support.fogbugz.com/article/52425-create-api-token-using-the-fogbugz-ui) or generate one via the API
 
-**For the TypeScript version:** Node.js 18+ — [download](https://nodejs.org/)
-
-**For the Python version:** Python 3.10+ — [download](https://www.python.org/)
-
-## Installation
-
-### TypeScript — from npm (recommended)
-
-```bash
-npm install -g fogbugz-mcp
-```
-
-Or run directly with `npx`:
-
-```bash
-npx fogbugz-mcp
-```
-
-### TypeScript — from source
-
-```bash
-git clone https://github.com/bardiabarabadi/FogBugz-MCP.git
-cd FogBugz-MCP/ts
-npm install
-npm run build
-```
-
-### Python — from PyPI (recommended)
-
-```bash
-pip install fogbugz-mcp
-```
-
-### Python — from source
-
-```bash
-git clone https://github.com/bardiabarabadi/FogBugz-MCP.git
-cd FogBugz-MCP/python
-pip install -e .
-```
-
 ## Configuration
 
 The server requires two environment variables:
@@ -88,11 +47,40 @@ You can obtain an API token from:
 
 Tokens do not expire.
 
-## Connecting to Cursor
+---
+
+## TypeScript
+
+### Prerequisites
+
+Node.js 18+ — [download](https://nodejs.org/)
+
+### Installation
+
+**From npm (recommended):**
+
+```bash
+npm install -g fogbugz-mcp
+```
+
+Or run directly with `npx`:
+
+```bash
+npx fogbugz-mcp
+```
+
+**From source:**
+
+```bash
+git clone https://github.com/bardiabarabadi/FogBugz-MCP.git
+cd FogBugz-MCP/ts
+npm install
+npm run build
+```
+
+### Connecting to Cursor
 
 Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.json` in your project root (or your global Cursor config).
-
-### Using the TypeScript version
 
 ```json
 {
@@ -109,7 +97,102 @@ Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.jso
 }
 ```
 
-### Using the Python version (global install)
+Restart Cursor after saving. To verify, open Cursor's MCP panel (gear icon → MCP) and check that `fogbugz` appears as connected.
+
+### Connecting to Claude Desktop
+
+Edit `claude_desktop_config.json`:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "fogbugz": {
+      "command": "npx",
+      "args": ["-y", "fogbugz-mcp"],
+      "env": {
+        "FOGBUGZ_URL": "https://mycompany.fogbugz.com",
+        "FOGBUGZ_TOKEN": "your-api-token-here"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop after saving. You should see the MCP tools icon in the chat input.
+
+### Development
+
+```bash
+cd ts
+
+# Run in development mode (no build needed)
+FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token npm run dev
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Type-check without emitting
+npx tsc --noEmit
+```
+
+### Project Structure
+
+```
+ts/
+  src/
+    index.ts                    — Entry point: creates MCP server, registers tools, starts stdio transport
+    fogbugz-client.ts           — HTTP client wrapping the FogBugz JSON API
+    types.ts                    — TypeScript types for API responses
+    tools/
+      search-cases.ts           — search_cases tool
+      get-case.ts               — get_case tool
+      get-case-comments.ts      — get_case_comments tool
+      list-people.ts            — list_people tool
+      edit-case.ts              — edit_case tool
+      assign-case.ts            — assign_case tool
+      resolve-case.ts           — resolve_case tool
+      close-case.ts             — close_case tool
+      reopen-case.ts            — reopen_case tool
+  tests/
+    fogbugz-client.test.ts      — Unit tests for the FogBugz API client
+    tools.test.ts               — Unit tests for all MCP tool handlers
+```
+
+---
+
+## Python
+
+### Prerequisites
+
+Python 3.10+ — [download](https://www.python.org/)
+
+### Installation
+
+**From PyPI (recommended):**
+
+```bash
+pip install fogbugz-mcp
+```
+
+**From source:**
+
+```bash
+git clone https://github.com/bardiabarabadi/FogBugz-MCP.git
+cd FogBugz-MCP/python
+pip install -e .
+```
+
+### Connecting to Cursor
+
+Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.json` in your project root (or your global Cursor config).
+
+**Global install** (i.e. `pip install fogbugz-mcp`):
 
 ```json
 {
@@ -126,13 +209,7 @@ Add the server to your Cursor MCP configuration. Create or edit `.cursor/mcp.jso
 }
 ```
 
-This assumes `fogbugz-mcp` is on your `PATH` (i.e. you ran `pip install fogbugz-mcp`).
-
-### Using the Python version (venv install)
-
-If you installed the package inside a virtual environment, point the command at the Python executable inside that venv:
-
-**macOS / Linux:**
+**Venv install — macOS / Linux:**
 
 ```json
 {
@@ -149,7 +226,7 @@ If you installed the package inside a virtual environment, point the command at 
 }
 ```
 
-**Windows:**
+**Venv install — Windows:**
 
 ```json
 {
@@ -166,35 +243,16 @@ If you installed the package inside a virtual environment, point the command at 
 }
 ```
 
-Replace the credentials and venv path with your own values. Restart Cursor after saving.
+Replace the credentials and venv path with your own values. Restart Cursor after saving. To verify, open Cursor's MCP panel (gear icon → MCP) and check that `fogbugz` appears as connected.
 
-To verify, open Cursor's MCP panel (gear icon → MCP) and check that `fogbugz` appears as connected.
-
-## Connecting to Claude Desktop
+### Connecting to Claude Desktop
 
 Edit `claude_desktop_config.json`:
 
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-### Using the TypeScript version
-
-```json
-{
-  "mcpServers": {
-    "fogbugz": {
-      "command": "npx",
-      "args": ["-y", "fogbugz-mcp"],
-      "env": {
-        "FOGBUGZ_URL": "https://mycompany.fogbugz.com",
-        "FOGBUGZ_TOKEN": "your-api-token-here"
-      }
-    }
-  }
-}
-```
-
-### Using the Python version (global install)
+**Global install:**
 
 ```json
 {
@@ -211,9 +269,7 @@ Edit `claude_desktop_config.json`:
 }
 ```
 
-### Using the Python version (venv install)
-
-**macOS / Linux:**
+**Venv install — macOS / Linux:**
 
 ```json
 {
@@ -230,7 +286,7 @@ Edit `claude_desktop_config.json`:
 }
 ```
 
-**Windows:**
+**Venv install — Windows:**
 
 ```json
 {
@@ -248,6 +304,47 @@ Edit `claude_desktop_config.json`:
 ```
 
 Restart Claude Desktop after saving. You should see the MCP tools icon in the chat input.
+
+### Development
+
+```bash
+cd python
+
+# Install in editable mode with dev dependencies
+pip install -e .
+pip install pytest pytest-asyncio
+
+# Run tests
+pytest tests/ -v
+
+# Run the server
+FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token fogbugz-mcp
+```
+
+### Project Structure
+
+```
+python/
+  src/fogbugz_mcp/
+    server.py                   — Entry point: creates FastMCP server, registers tools, starts stdio transport
+    fogbugz_client.py           — Async HTTP client wrapping the FogBugz JSON API
+    types.py                    — TypedDict definitions for API responses
+    tools/
+      search_cases.py           — search_cases tool
+      get_case.py               — get_case tool
+      get_case_comments.py      — get_case_comments tool
+      list_people.py            — list_people tool
+      edit_case.py              — edit_case tool
+      assign_case.py            — assign_case tool
+      resolve_case.py           — resolve_case tool
+      close_case.py             — close_case tool
+      reopen_case.py            — reopen_case tool
+  tests/
+    test_fogbugz_client.py      — Unit tests for the FogBugz API client
+    test_tools.py               — Unit tests for all MCP tool handlers
+```
+
+---
 
 ## Tool Reference
 
@@ -352,84 +449,6 @@ Once connected, you can ask your AI assistant things like:
 - *"Resolve case 4567 as Fixed"*
 - *"List all users whose name contains 'Smith'"*
 - *"Summarize the discussion in case 9012"*
-
-## Development
-
-### TypeScript
-
-```bash
-cd ts
-
-# Run in development mode (no build needed)
-FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token npm run dev
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Type-check without emitting
-npx tsc --noEmit
-```
-
-### Python
-
-```bash
-cd python
-
-# Install in editable mode with dev dependencies
-pip install -e .
-pip install pytest pytest-asyncio
-
-# Run tests
-pytest tests/ -v
-
-# Run the server
-FOGBUGZ_URL=https://mycompany.fogbugz.com FOGBUGZ_TOKEN=your-token fogbugz-mcp
-```
-
-## Project Structure
-
-```
-ts/                             — TypeScript implementation
-  src/
-    index.ts                    — Entry point: creates MCP server, registers tools, starts stdio transport
-    fogbugz-client.ts           — HTTP client wrapping the FogBugz JSON API
-    types.ts                    — TypeScript types for API responses
-    tools/
-      search-cases.ts           — search_cases tool
-      get-case.ts               — get_case tool
-      get-case-comments.ts      — get_case_comments tool
-      list-people.ts            — list_people tool
-      edit-case.ts              — edit_case tool
-      assign-case.ts            — assign_case tool
-      resolve-case.ts           — resolve_case tool
-      close-case.ts             — close_case tool
-      reopen-case.ts            — reopen_case tool
-  tests/
-    fogbugz-client.test.ts      — Unit tests for the FogBugz API client
-    tools.test.ts               — Unit tests for all MCP tool handlers
-
-python/                         — Python implementation
-  src/fogbugz_mcp/
-    server.py                   — Entry point: creates FastMCP server, registers tools, starts stdio transport
-    fogbugz_client.py           — Async HTTP client wrapping the FogBugz JSON API
-    types.py                    — TypedDict definitions for API responses
-    tools/
-      search_cases.py           — search_cases tool
-      get_case.py               — get_case tool
-      get_case_comments.py      — get_case_comments tool
-      list_people.py            — list_people tool
-      edit_case.py              — edit_case tool
-      assign_case.py            — assign_case tool
-      resolve_case.py           — resolve_case tool
-      close_case.py             — close_case tool
-      reopen_case.py            — reopen_case tool
-  tests/
-    test_fogbugz_client.py      — Unit tests for the FogBugz API client
-    test_tools.py               — Unit tests for all MCP tool handlers
-```
 
 ## Troubleshooting
 
