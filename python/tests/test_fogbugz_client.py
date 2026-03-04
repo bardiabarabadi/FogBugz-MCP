@@ -69,6 +69,23 @@ class TestSearch:
             assert "max" not in body
 
 
+class TestNewCase:
+    @pytest.mark.asyncio
+    async def test_sends_fields_to_new_endpoint(self, client):
+        case_data = {"case": {"ixBug": 999, "operations": ["edit"]}}
+        mock_resp = _mock_response(case_data)
+
+        with patch.object(client._http, "post", new_callable=AsyncMock, return_value=mock_resp) as mock_post:
+            result = await client.new_case({"sTitle": "Brand new", "sProject": "Main"})
+            url = mock_post.call_args[0][0]
+            body = mock_post.call_args[1]["json"]
+            assert url == "https://test.fogbugz.com/api/new"
+            assert body["sTitle"] == "Brand new"
+            assert body["sProject"] == "Main"
+            assert body["token"] == "test-token"
+            assert result["case"]["ixBug"] == 999
+
+
 class TestEdit:
     @pytest.mark.asyncio
     async def test_sends_ix_bug_and_fields(self, client):

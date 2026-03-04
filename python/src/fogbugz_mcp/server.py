@@ -8,6 +8,7 @@ from mcp.server.fastmcp import FastMCP
 from .fogbugz_client import FogBugzClient
 from .tools.assign_case import register_assign_case
 from .tools.close_case import register_close_case
+from .tools.create_case import register_create_case
 from .tools.edit_case import register_edit_case
 from .tools.get_case import register_get_case
 from .tools.get_case_comments import register_get_case_comments
@@ -40,6 +41,7 @@ def create_server() -> FastMCP:
     register_get_case(mcp, client)
     register_get_case_comments(mcp, client)
     register_list_people(mcp, client)
+    register_create_case(mcp, client)
     register_edit_case(mcp, client)
     register_assign_case(mcp, client)
     register_resolve_case(mcp, client)

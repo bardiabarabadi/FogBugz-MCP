@@ -82,6 +82,26 @@ describe("FogBugzClient", () => {
     });
   });
 
+  describe("newCase", () => {
+    it("sends fields to the new endpoint", async () => {
+      const caseData = { case: { ixBug: 999, operations: ["edit"] } };
+      const fetchMock = mockFetch(caseData);
+      vi.stubGlobal("fetch", fetchMock);
+
+      const result = await client.newCase({ sTitle: "Brand new", sProject: "Main" });
+      const [url, options] = fetchMock.mock.calls[0];
+      const body = JSON.parse(options.body);
+
+      expect(url).toBe("https://test.fogbugz.com/api/new");
+      expect(body.sTitle).toBe("Brand new");
+      expect(body.sProject).toBe("Main");
+      expect(body.token).toBe("test-token");
+      expect(result.case.ixBug).toBe(999);
+
+      vi.unstubAllGlobals();
+    });
+  });
+
   describe("edit", () => {
     it("sends ixBug and fields", async () => {
       const caseData = { case: { ixBug: 5, operations: ["edit"] } };

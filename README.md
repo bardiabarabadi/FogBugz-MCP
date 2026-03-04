@@ -19,6 +19,7 @@ Both expose identical tools and produce the same output.
 | `get_case` | Get detailed case info (title, status, project, milestone, priority, tags, kanban column, parent/child, dates) |
 | `get_case_comments` | Retrieve all comments, events, and attachments for a case |
 | `list_people` | List and search FogBugz users by name or email |
+| `create_case` | Create a new case with title, project, priority, assignee, tags, and more |
 | `edit_case` | Edit case fields: title, project, milestone, priority, tags, kanban column, due date, and more |
 | `assign_case` | Reassign a case to another person |
 | `resolve_case` | Resolve a case with an optional resolution status |
@@ -154,6 +155,7 @@ ts/
       get-case.ts               — get_case tool
       get-case-comments.ts      — get_case_comments tool
       list-people.ts            — list_people tool
+      create-case.ts            — create_case tool
       edit-case.ts              — edit_case tool
       assign-case.ts            — assign_case tool
       resolve-case.ts           — resolve_case tool
@@ -334,6 +336,7 @@ python/
       get_case.py               — get_case tool
       get_case_comments.py      — get_case_comments tool
       list_people.py            — list_people tool
+      create_case.py            — create_case tool
       edit_case.py              — edit_case tool
       assign_case.py            — assign_case tool
       resolve_case.py           — resolve_case tool
@@ -385,6 +388,24 @@ List FogBugz users with optional filtering.
 **Parameters:**
 - `search` (string, optional) — Filter by name or email (case-insensitive substring)
 - `include_inactive` (boolean, optional, default false) — Include inactive/deleted users
+
+### create_case
+
+Create a new FogBugz case.
+
+**Parameters:**
+- `title` (string, required) — Title for the new case
+- `project` (string, optional)
+- `area` (string, optional)
+- `milestone` (string, optional)
+- `priority` (string, optional) — e.g. `"Must Fix"`, `"Fix If Time"`
+- `category` (string, optional) — e.g. `"Bug"`, `"Feature"`
+- `tags` (string[], optional)
+- `assigned_to` (string, optional) — Full name of the person to assign to
+- `kanban_column` (string, optional)
+- `parent_case` (number, optional)
+- `due_date` (string, optional) — ISO 8601 format
+- `comment` (string, optional) — Initial comment / description
 
 ### edit_case
 

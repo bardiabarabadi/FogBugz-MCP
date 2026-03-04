@@ -7,6 +7,7 @@ import pytest
 from fogbugz_mcp.fogbugz_client import FogBugzClient
 from fogbugz_mcp.tools.assign_case import register_assign_case
 from fogbugz_mcp.tools.close_case import register_close_case
+from fogbugz_mcp.tools.create_case import register_create_case
 from fogbugz_mcp.tools.edit_case import register_edit_case
 from fogbugz_mcp.tools.get_case import register_get_case
 from fogbugz_mcp.tools.get_case_comments import register_get_case_comments
@@ -19,6 +20,7 @@ from fogbugz_mcp.tools.search_cases import register_search_cases
 def _make_mock_client() -> FogBugzClient:
     client = MagicMock(spec=FogBugzClient)
     client.search = AsyncMock()
+    client.new_case = AsyncMock()
     client.edit = AsyncMock()
     client.assign = AsyncMock()
     client.resolve = AsyncMock()
@@ -270,6 +272,50 @@ class TestListPeople:
         assert "1 user(s)" in filtered
         assert "Alice Admin" in filtered
         assert "Bob Builder" not in filtered
+
+
+class TestCreateCase:
+    @pytest.mark.asyncio
+    async def test_creates_case_with_all_fields(self):
+        client = _make_mock_client()
+        client.new_case.return_value = {"case": {"ixBug": 999, "operations": ["edit"]}}
+
+        handler = _capture_tool(register_create_case, client)
+        text = await handler(
+            title="New Bug Report",
+            project="Backend",
+            priority="Must Fix",
+            category="Bug",
+            assigned_to="Alice",
+            tags=["critical"],
+            comment="Found a crash",
+        )
+
+        client.new_case.assert_called_once_with({
+            "sTitle": "New Bug Report",
+            "sProject": "Backend",
+            "sPriority": "Must Fix",
+            "sCategory": "Bug",
+            "sPersonAssignedTo": "Alice",
+            "sTags": "critical",
+            "sEvent": "Found a crash",
+        })
+        assert "created successfully" in text
+        assert "999" in text
+        assert "New Bug Report" in text
+        assert "https://fb.test/f/cases/999" in text
+
+    @pytest.mark.asyncio
+    async def test_creates_case_with_only_title(self):
+        client = _make_mock_client()
+        client.new_case.return_value = {"case": {"ixBug": 1000, "operations": ["edit"]}}
+
+        handler = _capture_tool(register_create_case, client)
+        text = await handler(title="Minimal case")
+
+        client.new_case.assert_called_once_with({"sTitle": "Minimal case"})
+        assert "1000" in text
+        assert "created successfully" in text
 
 
 class TestEditCase:

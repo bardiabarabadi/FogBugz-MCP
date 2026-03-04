@@ -73,6 +73,12 @@ export class FogBugzClient {
     });
   }
 
+  async newCase(
+    fields: Record<string, unknown>,
+  ): Promise<CaseActionData> {
+    return this.request<CaseActionData>("new", fields);
+  }
+
   async edit(
     ixBug: number,
     fields: Record<string, unknown>,

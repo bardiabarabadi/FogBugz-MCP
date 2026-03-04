@@ -51,6 +51,9 @@ class FogBugzClient:
             params["max"] = max
         return await self._request("search", params)
 
+    async def new_case(self, fields: dict[str, Any]) -> CaseActionData:
+        return await self._request("new", fields)
+
     async def edit(self, ix_bug: int, fields: dict[str, Any]) -> CaseActionData:
         return await self._request("edit", {"ixBug": ix_bug, **fields})
 

@@ -5,6 +5,7 @@ import { registerSearchCases } from "../src/tools/search-cases.js";
 import { registerGetCase } from "../src/tools/get-case.js";
 import { registerGetCaseComments } from "../src/tools/get-case-comments.js";
 import { registerListPeople } from "../src/tools/list-people.js";
+import { registerCreateCase } from "../src/tools/create-case.js";
 import { registerEditCase } from "../src/tools/edit-case.js";
 import { registerAssignCase } from "../src/tools/assign-case.js";
 import { registerResolveCase } from "../src/tools/resolve-case.js";
@@ -38,6 +39,7 @@ function captureTools() {
 function createMockClient() {
   return {
     search: vi.fn(),
+    newCase: vi.fn(),
     edit: vi.fn(),
     assign: vi.fn(),
     resolve: vi.fn(),
@@ -49,6 +51,7 @@ function createMockClient() {
     getCaseUrl: vi.fn((ixBug: number) => `https://fb.test/f/cases/${ixBug}`),
   } as unknown as FogBugzClient & {
     search: ReturnType<typeof vi.fn>;
+    newCase: ReturnType<typeof vi.fn>;
     edit: ReturnType<typeof vi.fn>;
     assign: ReturnType<typeof vi.fn>;
     resolve: ReturnType<typeof vi.fn>;
@@ -302,6 +305,58 @@ describe("list_people tool", () => {
     expect(filtered.content[0].text).toContain("1 user(s)");
     expect(filtered.content[0].text).toContain("Alice Admin");
     expect(filtered.content[0].text).not.toContain("Bob Builder");
+  });
+});
+
+describe("create_case tool", () => {
+  it("creates a case with all fields", async () => {
+    const { mockServer, tools } = captureTools();
+    const client = createMockClient();
+    client.newCase.mockResolvedValue({
+      case: { ixBug: 999, operations: ["edit"] },
+    });
+
+    registerCreateCase(mockServer, client);
+    const tool = tools.get("create_case")!;
+    const result = await tool.callback({
+      title: "New Bug Report",
+      project: "Backend",
+      priority: "Must Fix",
+      category: "Bug",
+      assigned_to: "Alice",
+      tags: ["critical"],
+      comment: "Found a crash",
+    });
+
+    expect(client.newCase).toHaveBeenCalledWith({
+      sTitle: "New Bug Report",
+      sProject: "Backend",
+      sPriority: "Must Fix",
+      sCategory: "Bug",
+      sPersonAssignedTo: "Alice",
+      sTags: "critical",
+      sEvent: "Found a crash",
+    });
+    expect(result.content[0].text).toContain("created successfully");
+    expect(result.content[0].text).toContain("999");
+    expect(result.content[0].text).toContain("New Bug Report");
+    expect(result.content[0].text).toContain("https://fb.test/f/cases/999");
+  });
+
+  it("creates a case with only a title", async () => {
+    const { mockServer, tools } = captureTools();
+    const client = createMockClient();
+    client.newCase.mockResolvedValue({
+      case: { ixBug: 1000, operations: ["edit"] },
+    });
+
+    registerCreateCase(mockServer, client);
+    const tool = tools.get("create_case")!;
+    const result = await tool.callback({ title: "Minimal case" });
+
+    expect(client.newCase).toHaveBeenCalledWith({ sTitle: "Minimal case" });
+    expect(result.content[0].text).toContain("1000");
+    expect(result.content[0].text).toContain("created successfully");
   });
 });
 

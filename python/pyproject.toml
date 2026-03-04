@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fogbugz-mcp"
-version = "1.0.0"
+version = "1.1.0"
 description = "MCP server for FogBugz (Manuscript) – search cases, view details, manage lifecycle, and more."
 readme = "../README.md"
 license = "MIT"
